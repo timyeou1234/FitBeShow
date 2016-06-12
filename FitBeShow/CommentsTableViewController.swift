@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CommentsTableViewController: UITableViewController, LikeButtonDelegat, CommentButtonDelegate {
+class CommentsTableViewController: UIViewController, LikeButtonDelegate, CommentButtonDelegate {
     
 //    override func viewWillAppear(animated: Bool) {
 //        tableView.setContentOffset(CGPointMake(CGFloat(0), CGFloat(-50)) , animated: true)
@@ -16,11 +16,13 @@ class CommentsTableViewController: UITableViewController, LikeButtonDelegat, Com
     
     var userArray:[User] = []
     var rowAtSelect:Int = 0
+    
     var tim = User(name: "Tim", selfieName: "selfie")
     var john = User(name:"John", selfieName: "first")
     var tom = User(name: "Tommy", selfieName: "clock")
     var Jonse = User(name: "Jones", selfieName: "facebook")
     
+    @IBOutlet weak var tableView: UITableView!
     
     
 //    var commentContext:String = ""
@@ -32,9 +34,8 @@ class CommentsTableViewController: UITableViewController, LikeButtonDelegat, Com
         tableView.rowHeight = UITableViewAutomaticDimension
         navigationController?.navigationBar.backgroundColor = UIColor(red: 69/255, green: 88/255, blue: 151/255, alpha: 1)
         
-        tableView.contentInset.bottom = 50
-        
         tableView.registerNib(UINib(nibName: "CommentsTableViewCell", bundle: nil), forCellReuseIdentifier: "Cell")
+        tableView.registerNib(UINib(nibName: "CommentsPageCommentsBelowTableViewCell", bundle: nil), forCellReuseIdentifier: "CellForRow")
         
         tim.comments(UserWhoComments(comment: "Hi", likeNum: 20))
         john.comments(UserWhoComments(comment: "What's up?", likeNum: 15))
@@ -58,32 +59,26 @@ class CommentsTableViewController: UITableViewController, LikeButtonDelegat, Com
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return userArray.count
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 1
-    }
+        
+        if userArray[section].userWhoCommentsArray![0].commentsInCommentsArray!.count > 0{
+            return 2
+        }else{
+            return 1
+        }
+        }
     
-    func like(cell:CommentsTableViewCell) {
-        print(self.tableView.indexPathForRowAtPoint(cell.center)!.section)
-//        self.tableView.indexPathForCell(cell)
-        cell.owner!.userWhoCommentsArray![0].likeNum += 1
-        
-        
-        self.tableView.reloadData()
-    }
-    
-    func dislike(cell:CommentsTableViewCell) {
-        print(self.tableView.indexPathForRowAtPoint(cell.center)!.section)
-        
-        cell.owner!.userWhoCommentsArray![0].likeNum -= 1
-        
-        
-        self.tableView.reloadData()
+    func like(cell: CommentsTableViewCell) {
+        cell.owner!.userWhoCommentsArray![0].like()
+//        self.tableView.reloadData()
+        self.tableView.reloadRowsAtIndexPaths([cell.rowAtSelectIndexpath!], withRowAnimation: .None)
+       
     }
     
     func commitComment() {
@@ -94,15 +89,23 @@ class CommentsTableViewController: UITableViewController, LikeButtonDelegat, Com
         self.performSegueWithIdentifier("showPostSegue", sender: cell.owner)
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
     }
     
 
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! CommentsTableViewCell
+        let cellForComments = tableView.dequeueReusableCellWithIdentifier("CellForRow", forIndexPath: indexPath) as! CommentsPageCommentsBelowTableViewCell
         
+        if  userArray[indexPath.section].userWhoCommentsArray![0].liked {
+            cell.likeButtonView.setTitleColor(.blueColor(), forState: UIControlState.Normal)
+        }else{
+            cell.likeButtonView.setTitleColor(.grayColor(), forState: UIControlState.Normal)
+        }
+
         cell.owner = userArray[indexPath.section]
         cell.delegate = self
         cell.commentDelegate = self
@@ -112,20 +115,20 @@ class CommentsTableViewController: UITableViewController, LikeButtonDelegat, Com
 //        cell.dayLable.text = commentsArray[indexPath.row].selfieDescription
         cell.likeLabe.text = "\(userArray[indexPath.section].userWhoCommentsArray![0].likeNum)人說讚"
         cell.contextLable.text = userArray[indexPath.section].userWhoCommentsArray![0].comment
+        cell.rowAtSelectIndexpath = indexPath
         
-        if userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray?.count == 0{
-            cell.viewForComments.addConstraint(NSLayoutConstraint(item: cell.viewForComments, attribute: NSLayoutAttribute.Height, relatedBy: NSLayoutRelation.Equal, toItem: cell.viewForComments, attribute: NSLayoutAttribute.Height, multiplier: 0.0, constant: 0))
-        }else{
-            cell.nameCommentsLable.text = userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray![0].user!.name
+       
+        
+        if indexPath.row == 1{
+            cellForComments.commentContextLable.text = userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray![0].comment
             
-            cell.commentsLable.text = userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray![0].comment
-            cell.commentsImageView.image = UIImage(named: userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray![0].user!.selfieName)
+            cellForComments.nameWhoCommentsLable.text = userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray![0].user!.name
+            
+            cellForComments.commentSelfieImageView.image = UIImage(named: userArray[indexPath.section].userWhoCommentsArray![0].commentsInCommentsArray![0].user!.selfieName)
+            
+            return cellForComments
         }
-        
-        
-        
-        
-        
+
         return cell
     }
     
@@ -171,7 +174,7 @@ class CommentsTableViewController: UITableViewController, LikeButtonDelegat, Com
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showPostSegue"{
-            let destinationController = segue.destinationViewController as! CommentsInCommentsTableViewController
+            let destinationController = segue.destinationViewController as! CommentsInCommentViewController
             destinationController.contextOwner = sender as? User
         }
     }

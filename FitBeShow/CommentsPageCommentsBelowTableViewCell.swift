@@ -1,17 +1,19 @@
 //
-//  ContextOfCommentsInCommentsTableViewCell.swift
+//  CommentsPageCommentsBelowTableViewCell.swift
 //  FitBeShow
 //
-//  Created by YeouTimothy on 2016/6/8.
+//  Created by YeouTimothy on 2016/6/11.
 //  Copyright © 2016年 YeouTimothy. All rights reserved.
 //
 
 import UIKit
 
-class ContextOfCommentsInCommentsTableViewCell: UITableViewCell {
+class CommentsPageCommentsBelowTableViewCell: UITableViewCell {
+    
     @IBOutlet weak var commentSelfieImageView: UIImageView!
     @IBOutlet weak var nameWhoCommentsLable: UILabel!
     @IBOutlet weak var commentContextLable: UILabel!
+
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -22,5 +24,5 @@ class ContextOfCommentsInCommentsTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    
+
 }

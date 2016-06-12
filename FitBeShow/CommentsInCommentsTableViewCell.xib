@@ -113,6 +113,7 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="commentLable" destination="OWu-fP-KBZ" id="Xr2-ag-Ok9"/>
+                <outlet property="likeButtonView" destination="RW4-hR-odG" id="COj-ie-O09"/>
                 <outlet property="likeNumLable" destination="uMt-mT-dMg" id="H8Z-45-Atc"/>
                 <outlet property="nameLable" destination="3Yb-vQ-uvT" id="HPQ-Uy-ohh"/>
                 <outlet property="selfieImageView" destination="KOW-Ay-Jxd" id="wb3-8C-Ywu"/>

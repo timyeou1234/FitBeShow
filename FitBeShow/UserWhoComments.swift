@@ -13,6 +13,7 @@ class UserWhoComments{
     let comment:String
     var likeNum:Int
     var commentsInCommentsArray:[CommentsInComments]?
+    var liked:Bool
     
     
     
@@ -21,9 +22,20 @@ class UserWhoComments{
         self.comment = comment
         self.likeNum = likeNum
         self.commentsInCommentsArray = []
+        self.liked = false
     }
     
     func commentContext(contextOfComment:CommentsInComments){
         self.commentsInCommentsArray?.append(contextOfComment)
+    }
+    
+    func like(){
+        if liked{
+            self.liked = false
+            likeNum -= 1
+        }else{
+            self.liked = true
+            likeNum += 1
+        }
     }
 }

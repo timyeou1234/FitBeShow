@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 class User{
     let name:String
     let selfieName:String
